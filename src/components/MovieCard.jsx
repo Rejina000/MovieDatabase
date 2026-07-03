@@ -1,6 +1,6 @@
 import React from "react";
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, onClick }) => {
   const getRatingColor = (rating) => {
     if (rating >= 8) return "bg-green-500";
     if (rating >= 5) return "bg-yellow-500";
@@ -8,7 +8,10 @@ const MovieCard = ({ movie }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 h-full cursor-pointer group">
+    <div 
+      onClick={() => onClick(movie)}
+      className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 h-full cursor-pointer group"
+    >
       <img
         src={movie.poster}
         alt={movie.title}
