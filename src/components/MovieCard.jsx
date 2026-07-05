@@ -10,7 +10,7 @@ const MovieCard = ({ movie, onClick, onToggleWatchlist, isWatchlisted }) => {
   return (
     <div 
       onClick={() => onClick(movie)}
-      className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 h-full cursor-pointer group"
+      className="bg-white rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-2 border border-gray-100 overflow-hidden transition-all duration-300 h-full cursor-pointer group"
     >
       <div className="relative aspect-[2/3] overflow-hidden bg-gray-200">
         <img
@@ -27,11 +27,11 @@ const MovieCard = ({ movie, onClick, onToggleWatchlist, isWatchlisted }) => {
           </span>
         </div>
       </div>
-      <div className="p-4">
+      <div className="p-5">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg font-bold truncate pr-2">{movie.title}</h3>
+          <h3 className="text-lg font-bold truncate pr-2 text-gray-800">{movie.title}</h3>
         </div>
-        <p className="text-gray-600 text-sm mb-4">{movie.genre} | {movie.year}</p>
+        <p className="text-gray-500 text-sm mb-5">{movie.genre} | {movie.year}</p>
 
         {/* Watchlist Button */}
         <button
@@ -39,10 +39,10 @@ const MovieCard = ({ movie, onClick, onToggleWatchlist, isWatchlisted }) => {
             e.stopPropagation(); // Prevent opening detail view when clicking button
             onToggleWatchlist(movie);
           }}
-          className={`w-full py-2 rounded-lg font-bold transition-colors ${
+          className={`w-full py-2.5 rounded-xl font-bold transition-all duration-200 ${
             isWatchlisted 
-              ? "bg-red-100 text-red-600 border border-red-200" 
-              : "bg-blue-600 text-white hover:bg-blue-700"
+              ? "bg-red-50 text-red-600 border border-red-100 hover:bg-red-100" 
+              : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md"
           }`}
         >
           {isWatchlisted ? "Remove from Watch Later" : "Add to Watch Later"}
