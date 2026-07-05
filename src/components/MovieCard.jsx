@@ -12,20 +12,24 @@ const MovieCard = ({ movie, onClick, onToggleWatchlist, isWatchlisted }) => {
       onClick={() => onClick(movie)}
       className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 h-full cursor-pointer group"
     >
-      <img
-        src={movie.poster}
-        alt={movie.title}
-        className="w-full h-64 object-cover transform group-hover:scale-110 group-hover:brightness-90 transition-transform duration-500"
-        onError={(e) => {
-          e.target.src = "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop";
-        }}
-      />
+      <div className="relative aspect-[2/3] overflow-hidden bg-gray-200">
+        <img
+          src={movie.poster}
+          alt={movie.title}
+          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+          onError={(e) => {
+            e.target.src = "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop";
+          }}
+        />
+        <div className="absolute top-3 right-3">
+          <span className={`text-white px-2 py-1 rounded shadow-md text-xs font-bold ${getRatingColor(movie.rating)}`}>
+            {movie.rating} ★
+          </span>
+        </div>
+      </div>
       <div className="p-4">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg font-bold">{movie.title}</h3>
-          <span className={`text-white px-2 py-1 rounded text-xs font-bold ${getRatingColor(movie.rating)}`}>
-            {movie.rating}
-          </span>
+          <h3 className="text-lg font-bold truncate pr-2">{movie.title}</h3>
         </div>
         <p className="text-gray-600 text-sm mb-4">{movie.genre} | {movie.year}</p>
 
