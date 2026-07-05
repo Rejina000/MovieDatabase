@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import MovieGrid from "./components/MovieGrid";
 import AddMovieForm from "./components/AddMovieForm";
@@ -66,6 +66,18 @@ function App() {
   // 1. Separate state array for Watchlist
   const [watchlistIds, setWatchlistIds] = useState([]);
   const [isWatchlistView, setIsWatchlistView] = useState(false);
+  
+  // Dashboard stats
+  const [stats, setStats] = useState({ total: 0, averageRating: 0 });
+
+  useEffect(() => {
+    const total = movies.length;
+    const avg = total > 0 
+      ? (movies.reduce((acc, m) => acc + m.rating, 0) / total).toFixed(1) 
+      : 0;
+    
+    setStats({ total, averageRating: avg });
+  }, [movies]);
 
   const handleAddMovie = (newMovie) => {
     setMovies([newMovie, ...movies]);
@@ -118,6 +130,15 @@ function App() {
               <h2 className="text-4xl font-extrabold text-blue-900 mb-6 underline underline-offset-8 decoration-blue-200">
                 {isWatchlistView ? "My Watch Later" : "Movie Gallery"}
               </h2>
+
+              <div className="flex gap-4 justify-center mb-8 text-sm font-bold text-blue-700">
+                <span className="bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100 shadow-sm">
+                  Total Movies: {stats.total}
+                </span>
+                <span className="bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100 shadow-sm">
+                  Avg Rating: {stats.averageRating} ★
+                </span>
+              </div>
               
               <div className="max-w-md mx-auto relative group">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
