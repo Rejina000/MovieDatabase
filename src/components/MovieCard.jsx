@@ -1,6 +1,6 @@
 import React from "react";
 
-const MovieCard = ({ movie, onClick }) => {
+const MovieCard = ({ movie, onClick, onToggleWatchlist, isWatchlisted }) => {
   const getRatingColor = (rating) => {
     if (rating >= 8) return "bg-green-500";
     if (rating >= 5) return "bg-yellow-500";
@@ -27,7 +27,22 @@ const MovieCard = ({ movie, onClick }) => {
             {movie.rating}
           </span>
         </div>
-        <p className="text-gray-600 text-sm">{movie.genre} | {movie.year}</p>
+        <p className="text-gray-600 text-sm mb-4">{movie.genre} | {movie.year}</p>
+
+        {/* Watchlist Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent opening detail view when clicking button
+            onToggleWatchlist(movie);
+          }}
+          className={`w-full py-2 rounded-lg font-bold transition-colors ${
+            isWatchlisted 
+              ? "bg-red-100 text-red-600 border border-red-200" 
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+        >
+          {isWatchlisted ? "Remove from Watch Later" : "Add to Watch Later"}
+        </button>
       </div>
     </div>
   );
