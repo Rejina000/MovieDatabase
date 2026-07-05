@@ -178,7 +178,7 @@ function App() {
         )}
 
         {showForm && (
-          <div className="max-w-xl mx-auto mb-16">
+          <div className="max-w-2xl mx-auto mb-16">
             <AddMovieForm onAddMovie={handleAddMovie} onCancel={() => setShowForm(false)} />
           </div>
         )}

@@ -23,56 +23,109 @@ const AddMovieForm = ({ onAddMovie, onCancel }) => {
     });
   };
 
+  const InputWrapper = ({ icon, children, label }) => (
+    <div className="space-y-1.5 flex-1">
+      <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+        <span>{icon}</span> {label}
+      </label>
+      <div className="relative group">
+        {children}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-md mx-auto my-10">
-      <h2 className="text-2xl font-bold mb-6 text-blue-900">Add New Movie</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input 
-          type="text" 
-          placeholder="Movie Title" 
-          className="w-full p-2 border rounded"
-          value={formData.title}
-          onChange={(e) => setFormData({...formData, title: e.target.value})}
-        />
-        <input 
-          type="text" 
-          placeholder="Genre" 
-          className="w-full p-2 border rounded"
-          value={formData.genre}
-          onChange={(e) => setFormData({...formData, genre: e.target.value})}
-        />
-        <div className="flex gap-2">
-          <input 
-            type="number" 
-            placeholder="Year" 
-            className="w-1/2 p-2 border rounded"
-            value={formData.year}
-            onChange={(e) => setFormData({...formData, year: e.target.value})}
-          />
-          <input 
-            type="text" 
-            placeholder="Director" 
-            className="w-1/2 p-2 border rounded"
-            value={formData.director}
-            onChange={(e) => setFormData({...formData, director: e.target.value})}
-          />
+    <div className="bg-white p-8 rounded-3xl shadow-2xl border border-blue-50 max-w-2xl mx-auto my-4 transition-all duration-300">
+      <header className="mb-8 text-center sm:text-left">
+        <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
+          <span className="text-3xl">🎬</span>
+          <h2 className="text-3xl font-black text-blue-900 tracking-tight">Add New Movie</h2>
         </div>
-        <input 
-          type="text" 
-          placeholder="Poster Image URL" 
-          className="w-full p-2 border rounded"
-          value={formData.poster}
-          onChange={(e) => setFormData({...formData, poster: e.target.value})}
-        />
-        <textarea 
-          placeholder="Synopsis" 
-          className="w-full p-2 border rounded h-24"
-          value={formData.synopsis}
-          onChange={(e) => setFormData({...formData, synopsis: e.target.value})}
-        />
-        <div className="flex gap-4 pt-4">
-          <button type="submit" className="flex-1 bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">Save Movie</button>
-          <button type="button" onClick={onCancel} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded font-bold hover:bg-gray-300">Cancel</button>
+        <p className="text-gray-500 font-medium ml-0 sm:ml-12">Fill in the details below to add a new movie.</p>
+      </header>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-6">
+          {/* Movie Title */}
+          <InputWrapper icon="🎬" label="Movie Title">
+            <input 
+              type="text" 
+              placeholder="e.g. Inception" 
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
+              value={formData.title}
+              onChange={(e) => setFormData({...formData, title: e.target.value})}
+            />
+          </InputWrapper>
+
+          {/* Genre */}
+          <InputWrapper icon="🏷" label="Genre">
+            <input 
+              type="text" 
+              placeholder="e.g. Sci-Fi, Action" 
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
+              value={formData.genre}
+              onChange={(e) => setFormData({...formData, genre: e.target.value})}
+            />
+          </InputWrapper>
+
+          {/* Year and Director Row */}
+          <div className="flex flex-col sm:flex-row gap-6">
+            <InputWrapper icon="📅" label="Release Year">
+              <input 
+                type="number" 
+                placeholder="2024" 
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
+                value={formData.year}
+                onChange={(e) => setFormData({...formData, year: e.target.value})}
+              />
+            </InputWrapper>
+            <InputWrapper icon="👤" label="Director">
+              <input 
+                type="text" 
+                placeholder="Christopher Nolan" 
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
+                value={formData.director}
+                onChange={(e) => setFormData({...formData, director: e.target.value})}
+              />
+            </InputWrapper>
+          </div>
+
+          {/* Poster URL */}
+          <InputWrapper icon="🔗" label="Poster Image URL">
+            <input 
+              type="text" 
+              placeholder="https://example.com/poster.jpg" 
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
+              value={formData.poster}
+              onChange={(e) => setFormData({...formData, poster: e.target.value})}
+            />
+          </InputWrapper>
+
+          {/* Synopsis */}
+          <InputWrapper icon="📝" label="Synopsis">
+            <textarea 
+              placeholder="A brief description of the movie..." 
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 h-32 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium resize-none"
+              value={formData.synopsis}
+              onChange={(e) => setFormData({...formData, synopsis: e.target.value})}
+            />
+          </InputWrapper>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+          <button 
+            type="submit" 
+            className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2"
+          >
+            <span>💾</span> Save Movie
+          </button>
+          <button 
+            type="button" 
+            onClick={onCancel} 
+            className="flex-1 bg-gray-100 text-gray-600 py-4 rounded-xl font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </div>
