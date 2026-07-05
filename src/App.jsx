@@ -126,12 +126,12 @@ function App() {
       <main className="container mx-auto py-10 px-4">
         {!selectedMovie && !showForm && (
           <>
-            <header className="mb-12 text-center">
+            <header className="mb-6 text-center">
               <h2 className="text-4xl font-extrabold text-blue-900 mb-6 underline underline-offset-8 decoration-blue-200">
                 {isWatchlistView ? "My Watch Later" : "Movie Gallery"}
               </h2>
 
-              <div className="flex gap-4 justify-center mb-8 text-sm font-bold text-blue-700">
+              <div className="flex gap-4 justify-center mb-6 text-sm font-bold text-blue-700">
                 <span className="bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100 shadow-sm">
                   Total Movies: {stats.total}
                 </span>
