@@ -1,5 +1,16 @@
 import React, { useState } from "react";
 
+const InputWrapper = ({ icon, children, label }) => (
+  <div className="space-y-1.5 flex-1">
+    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+      <span>{icon}</span> {label}
+    </label>
+    <div className="relative group">
+      {children}
+    </div>
+  </div>
+);
+
 const AddMovieForm = ({ onAddMovie, onCancel }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -23,16 +34,6 @@ const AddMovieForm = ({ onAddMovie, onCancel }) => {
     });
   };
 
-  const InputWrapper = ({ icon, children, label }) => (
-    <div className="space-y-1.5 flex-1">
-      <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-        <span>{icon}</span> {label}
-      </label>
-      <div className="relative group">
-        {children}
-      </div>
-    </div>
-  );
 
   return (
     <div className="bg-white p-8 rounded-3xl shadow-2xl border border-blue-50 max-w-2xl mx-auto my-4 transition-all duration-300">
