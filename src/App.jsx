@@ -102,7 +102,7 @@ function App() {
     : filteredMovies;
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 text-gray-900 font-sans">
       <Navbar 
         onAddClick={() => {
           setShowForm(!showForm);
