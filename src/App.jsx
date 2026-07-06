@@ -5,55 +5,55 @@ import AddMovieForm from "./components/AddMovieForm";
 import MovieDetail from "./components/MovieDetail";
 
 const SAMPLE_MOVIES = [
-  { 
-    id: 1, 
-    title: "Saiyaara", 
-    genre: "Romance/Action", 
-    year: 2025, 
-    rating: 7.2, 
+  {
+    id: 1,
+    title: "Saiyaara",
+    genre: "Romance/Action",
+    year: 2025,
+    rating: 7.2,
     director: "Mohit Suri",
     synopsis: "A story of star-crossed lovers set against a backdrop of espionage and danger in the mountains of Syria.",
-    poster: "https://m.media-amazon.com/images/M/MV5BMTk2ZmFhYjctYWZiYy00N2IxLWEzMWItZGRiMDY4ZDQwZWFlXkEyXkFqcGc@._V1_.jpg" 
+    poster: "https://m.media-amazon.com/images/M/MV5BMTk2ZmFhYjctYWZiYy00N2IxLWEzMWItZGRiMDY4ZDQwZWFlXkEyXkFqcGc@._V1_.jpg"
   },
-  { 
-    id: 2, 
-    title: "Titanic", 
-    genre: "Romance/Drama", 
-    year: 1997, 
-    rating: 7.9, 
+  {
+    id: 2,
+    title: "Titanic",
+    genre: "Romance/Drama",
+    year: 1997,
+    rating: 7.9,
     director: "James Cameron",
     synopsis: "A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.",
-    poster: "https://upload.wikimedia.org/wikipedia/en/1/18/Titanic_%281997_film%29_poster.png" 
+    poster: "https://upload.wikimedia.org/wikipedia/en/1/18/Titanic_%281997_film%29_poster.png"
   },
-  { 
-    id: 3, 
-    title: "Dhurandhar", 
-    genre: "Action/Drama", 
-    year: 2015, 
-    rating: 6.8, 
+  {
+    id: 3,
+    title: "Dhurandhar",
+    genre: "Action/Drama",
+    year: 2015,
+    rating: 6.8,
     director: "Aditya Dhar",
     synopsis: "A high-stakes thriller involving family secrets, legendary rivals, and a man's quest for justice in a modern city.",
-    poster: "https://m.media-amazon.com/images/M/MV5BNzdkNjAxNWMtNWY3My00NTI1LTg2YWQtOGI3MDA0NzdhMjEyXkEyXkFqcGc@._V1_.jpg" 
+    poster: "https://m.media-amazon.com/images/M/MV5BNzdkNjAxNWMtNWY3My00NTI1LTg2YWQtOGI3MDA0NzdhMjEyXkEyXkFqcGc@._V1_.jpg"
   },
-  { 
-    id: 4, 
-    title: "3 Idiots", 
-    genre: "Comedy/Drama", 
-    year: 2009, 
-    rating: 8.4, 
+  {
+    id: 4,
+    title: "3 Idiots",
+    genre: "Comedy/Drama",
+    year: 2009,
+    rating: 8.4,
     director: "Rajkumar Hirani",
     synopsis: "Two friends search for their long lost companion. They revisit their college days and recall the memories of their friend who inspired them to think differently.",
-    poster: "https://upload.wikimedia.org/wikipedia/en/d/df/3_idiots_poster.jpg" 
+    poster: "https://upload.wikimedia.org/wikipedia/en/d/df/3_idiots_poster.jpg"
   },
-  { 
-    id: 5, 
-    title: "Article 370", 
-    genre: "Action/Thriller", 
-    year: 2024, 
-    rating: 8.1, 
+  {
+    id: 5,
+    title: "Article 370",
+    genre: "Action/Thriller",
+    year: 2024,
+    rating: 8.1,
     director: "Aditya Suhas Jambhale",
     synopsis: "An intelligence agent is sent on a mission to bring stability to a volatile region by navigating intense political conflict and danger.",
-    poster: "https://m.media-amazon.com/images/M/MV5BZjNlNWU0NGEtMGU2Ni00Y2UyLWI3MWUtM2VkZTMxMDljNGE0XkEyXkFqcGc@._V1_.jpg" 
+    poster: "https://m.media-amazon.com/images/M/MV5BZjNlNWU0NGEtMGU2Ni00Y2UyLWI3MWUtM2VkZTMxMDljNGE0XkEyXkFqcGc@._V1_.jpg"
   }
 ];
 
@@ -62,20 +62,20 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // 1. Separate state array for Watchlist
   const [watchlistIds, setWatchlistIds] = useState([]);
   const [isWatchlistView, setIsWatchlistView] = useState(false);
-  
+
   // Dashboard stats
   const [stats, setStats] = useState({ total: 0, averageRating: 0 });
 
   useEffect(() => {
     const total = movies.length; //use effect k garne vanera yeta lekhne(internal state vanda bahek external ko lagi we use useeffect)
-    const avg = total > 0 
-      ? (movies.reduce((acc, m) => acc + m.rating, 0) / total).toFixed(1) 
+    const avg = total > 0
+      ? (movies.reduce((acc, m) => acc + m.rating, 0) / total).toFixed(1)
       : 0;
-    
+
     setStats({ total, averageRating: avg });
   }, [movies]);
 
@@ -85,30 +85,30 @@ function App() {
   };
 
   const toggleWatchlist = (movie) => {
-    setWatchlistIds(prev => 
-      prev.includes(movie.id) 
-        ? prev.filter(id => id !== movie.id) 
+    setWatchlistIds(prev =>
+      prev.includes(movie.id)
+        ? prev.filter(id => id !== movie.id)
         : [...prev, movie.id]
     );
   };
 
-  const filteredMovies = movies.filter(movie => 
+  const filteredMovies = movies.filter(movie =>
     movie.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // If in watchlist view, further filter to only pinned movies
-  const displayMovies = isWatchlistView 
-    ? filteredMovies.filter(m => watchlistIds.includes(m.id)) 
+  const displayMovies = isWatchlistView
+    ? filteredMovies.filter(m => watchlistIds.includes(m.id))
     : filteredMovies;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 text-gray-900 font-sans">
-      <Navbar 
+    <div className="min-h-screen bg-[#F8FAFC] bg-[radial-gradient(at_0%_0%,_rgba(238,242,255,1)_0%,_transparent_50%),_radial-gradient(at_100%_0%,_rgba(245,243,255,1)_0%,_transparent_50%),_radial-gradient(at_100%_100%,_rgba(239,246,255,1)_0%,_transparent_50%),_radial-gradient(at_0%_100%,_rgba(253,242,248,1)_0%,_transparent_50%)] text-gray-900 font-sans">
+      <Navbar
         onAddClick={() => {
           setShowForm(!showForm);
           setSelectedMovie(null);
           setIsWatchlistView(false);
-        }} 
+        }}
         showForm={showForm}
         onBrowse={() => {
           setIsWatchlistView(false);
@@ -122,39 +122,65 @@ function App() {
         }}
         isWatchlistView={isWatchlistView}
       />
-      
+
       <main className="container mx-auto py-10 px-4">
         {!selectedMovie && !showForm && (
           <>
-            <header className="mb-6 text-center">
-              <h2 className="text-4xl font-extrabold text-blue-900 mb-6 underline underline-offset-8 decoration-blue-200">
-                {isWatchlistView ? "My Watch Later" : "Movie Gallery"}
-              </h2>
+            <header className="mb-8 text-center relative px-4">
+              <div className="max-w-4xl mx-auto">
+                <h2 className="text-3xl md:text-5xl font-black mb-2 tracking-tight">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-purple-600">
+                    Discover. Watch. Enjoy.
+                  </span>
+                </h2>
+                <p className="text-gray-500 text-sm md:text-base font-medium mb-6 max-w-xl mx-auto">
+                  Explore your personal collection of amazing movies.
+                </p>
 
-              <div className="flex gap-4 justify-center mb-6 text-sm font-bold text-blue-700">
-                <span className="bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100 shadow-sm">
-                  Total Movies: {stats.total}
-                </span>
-                <span className="bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100 shadow-sm">
-                  Avg Rating: {stats.averageRating} ★
-                </span>
+                <div className="flex flex-wrap gap-4 justify-center mb-8">
+                  <div className="bg-white px-5 py-3 rounded-2xl shadow-xl shadow-blue-500/5 border border-blue-50 flex items-center gap-3 transition-all hover:shadow-2xl hover:-translate-y-0.5">
+                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none mb-1">Total Movies</p>
+                      <p className="text-xl font-black text-gray-900 leading-none">{stats.total}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white px-5 py-3 rounded-2xl shadow-xl shadow-purple-500/5 border border-purple-50 flex items-center gap-3 transition-all hover:shadow-2xl hover:-translate-y-0.5">
+                    <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none mb-1">Avg Rating</p>
+                      <p className="text-xl font-black text-gray-900 leading-none flex items-center gap-1.5">
+                        {stats.averageRating} <span className="text-yellow-400 text-sm">★</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              
+
               <div className="max-w-md mx-auto relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Search movies..." 
+                <input
+                  type="text"
+                  placeholder="Search movies..."
                   className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-12 py-4 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 focus:bg-white transition-all font-medium text-gray-800"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 {searchTerm ? (
-                  <button 
+                  <button
                     onClick={() => setSearchTerm("")}
                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full p-1 transition-all"
                     title="Clear search"
@@ -172,9 +198,9 @@ function App() {
             </header>
 
             {displayMovies.length > 0 ? (
-              <MovieGrid 
-                movies={displayMovies} 
-                onMovieClick={(movie) => setSelectedMovie(movie)} 
+              <MovieGrid
+                movies={displayMovies}
+                onMovieClick={(movie) => setSelectedMovie(movie)}
                 onToggleWatchlist={toggleWatchlist}
                 watchlistIds={watchlistIds}
               />
@@ -183,7 +209,7 @@ function App() {
                 <p className="text-gray-400 text-xl font-medium">
                   {isWatchlistView ? "Your watch later list is currently empty." : "No movies found matching your search."}
                 </p>
-                <button 
+                <button
                   onClick={() => isWatchlistView ? setIsWatchlistView(false) : setSearchTerm("")}
                   className="mt-4 text-blue-600 font-bold hover:underline"
                 >
