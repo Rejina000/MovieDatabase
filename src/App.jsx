@@ -71,7 +71,7 @@ function App() {
   const [stats, setStats] = useState({ total: 0, averageRating: 0 });
 
   useEffect(() => {
-    const total = movies.length;
+    const total = movies.length; //use effect k garne vanera yeta lekhne(internal state vanda bahek external ko lagi we use useeffect)
     const avg = total > 0 
       ? (movies.reduce((acc, m) => acc + m.rating, 0) / total).toFixed(1) 
       : 0;
@@ -141,16 +141,33 @@ function App() {
               </div>
               
               <div className="max-w-md mx-auto relative group">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                  🔍
-                </span>
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
                 <input 
                   type="text" 
                   placeholder="Search movies..." 
-                  className="w-full bg-white border border-gray-200 rounded-2xl px-12 py-3.5 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium"
+                  className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-12 py-4 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 focus:bg-white transition-all font-medium text-gray-800"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                {searchTerm ? (
+                  <button 
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full p-1 transition-all"
+                    title="Clear search"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                ) : (
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-blue-50 text-blue-500 rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-wider hidden sm:block">
+                    Search
+                  </div>
+                )}
               </div>
             </header>
 
