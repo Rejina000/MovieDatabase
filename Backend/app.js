@@ -1,23 +1,21 @@
-import express from "express"
+import express from "express";
+import cors from "cors";
 import SAMPLE_MOVIES from "./data/movies.js";
+import dotenv from "dotenv";
+import movieRouter from "./src/routes/movieRoutes.js";
+import dbConnection from './src/config/db.js'
+
+dotenv.config();
+
 const app = express();
-app.use(express.json())
-const PORT = 3001; // Frontend ko application local host mai run vairaxa backend pani yesmai run vayo vane conflict aauxa so also initially default for JS is 3000
+const PORT = process.env.PORT || 3001;
 
-app.get("/movies",(req,res)=>{
-    //k kaam garne vanera yeta bhitra lekhne
-    return res.json(SAMPLE_MOVIES) //universal format vankai json ho so tei use gareko
-})
-app.post("/movies", (req, res) => {
-    const movie = req.body;
+app.use(express.json());
+app.use(cors());
 
-    SAMPLE_MOVIES.push(movie);
-
-    return res.status(201).json({
-        message: "Movie added successfully",
-        movie: movie
-    });
-});
+// Mount the movie router under /movies
+app.use("/movies", movieRouter);
+await dbConnection()
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
