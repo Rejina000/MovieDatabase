@@ -1,7 +1,11 @@
-import SAMPLE_MOVIES from "../data/movies.js";
+import SAMPLE_MOVIES from "../../data/movies.js";
 
 export function getAll() {
     return SAMPLE_MOVIES;
+}
+
+export function getById(id) {
+    return SAMPLE_MOVIES.find((movie) => movie.id === id);
 }
 
 export function addMovie(movie) {
