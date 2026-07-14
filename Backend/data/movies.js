@@ -1,6 +1,14 @@
+import mongoose from 'mongoose'
+import movie from './movie.js'
+import dotenv from 'dotenv'
+
+dotenv.config({
+    path:'./.env',
+})
+
 const SAMPLE_MOVIES = [
     { 
-      id: 1, 
+     
       title: "Saiyaara", 
       genre: "Romance/Action", 
       year: 2025, 
@@ -10,7 +18,7 @@ const SAMPLE_MOVIES = [
       poster: "https://m.media-amazon.com/images/M/MV5BMTk2ZmFhYjctYWZiYy00N2IxLWEzMWItZGRiMDY4ZDQwZWFlXkEyXkFqcGc@._V1_.jpg" 
     },
     { 
-      id: 2, 
+   
       title: "Titanic", 
       genre: "Romance/Drama", 
       year: 1997, 
@@ -20,7 +28,7 @@ const SAMPLE_MOVIES = [
       poster: "https://upload.wikimedia.org/wikipedia/en/1/18/Titanic_%281997_film%29_poster.png" 
     },
     { 
-      id: 3, 
+     
       title: "Dhurandhar", 
       genre: "Action/Drama", 
       year: 2015, 
@@ -30,7 +38,7 @@ const SAMPLE_MOVIES = [
       poster: "https://m.media-amazon.com/images/M/MV5BNzdkNjAxNWMtNWY3My00NTI1LTg2YWQtOGI3MDA0NzdhMjEyXkEyXkFqcGc@._V1_.jpg" 
     },
     { 
-      id: 4, 
+     
       title: "3 Idiots", 
       genre: "Comedy/Drama", 
       year: 2009, 
@@ -40,7 +48,7 @@ const SAMPLE_MOVIES = [
       poster: "https://upload.wikimedia.org/wikipedia/en/d/df/3_idiots_poster.jpg" 
     },
     { 
-      id: 5, 
+      
       title: "Article 370", 
       genre: "Action/Thriller", 
       year: 2024, 
@@ -50,4 +58,8 @@ const SAMPLE_MOVIES = [
       poster: "https://m.media-amazon.com/images/M/MV5BZjNlNWU0NGEtMGU2Ni00Y2UyLWI3MWUtM2VkZTMxMDljNGE0XkEyXkFqcGc@._V1_.jpg" 
     }
   ];
-  export default SAMPLE_MOVIES;
+  const connection=mongoose.connect(process.env.MONGODB_URL)
+  await movie.deleteMany({})
+  await movie.insertMany(SAMPLE_MOVIES)
+
+   export default SAMPLE_MOVIES;
