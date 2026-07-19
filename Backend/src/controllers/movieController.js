@@ -1,38 +1,44 @@
 import * as movieModel from "../models/movieModel.js";
 
 // Handle GET /movies
-export function getMovies(req, res) {
-    const movies = movieModel.getAll();
+export async function getMovies(req, res) {
+    const movies = await movieModel.getAll();
     return res.json(movies);
 }
 
 // Handle GET /movies/:id
-export function getMovieById(req, res) {
-    const movie = movieModel.getById(Number(req.params.id));
+export async function getMovieById(req, res) {
+    const movie = await movieModel.getById(req.params.id);
+
     if (!movie) {
         return res.status(404).json({
             error: "Movie not found for given id",
         });
     }
+
     return res.status(200).json(movie);
 }
 
+
 // Handle POST /movies
-export function createMovie(req, res) {
-    const movie = req.body;
-    movieModel.addMovie(movie);
+export async function createMovie(req, res) {
+    const newMovie = req.body;
+
+    const movie = await movieModel.addMovie(newMovie);
+
     return res.status(201).json({
         message: "Movie added successfully",
-        movie: movie,
+        movie,
     });
 }
 
 // Handle PUT /movies/:id
-export function updateMovie(req, res) {
-    const id = Number(req.params.id);
+export async function updateMovie(req, res) {
+    const id = req.params.id;
     const newMovie = req.body;
-    const updated = movieModel.updateMovie(id, newMovie);
-    
+
+    const updated = await movieModel.updateMovie(id, newMovie);
+
     if (!updated) {
         return res.status(404).json({
             error: "Movie not found for the given id",
