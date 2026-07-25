@@ -60,13 +60,18 @@ const AddMovieForm = ({ onAddMovie, onCancel }) => {
 
           {/* Genre */}
           <InputWrapper icon="🏷" label="Genre">
-            <input 
-              type="text" 
-              placeholder="e.g. Sci-Fi, Action" 
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium"
+            <select 
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all font-medium text-gray-700 focus:text-gray-900"
               value={formData.genre}
               onChange={(e) => setFormData({...formData, genre: e.target.value})}
-            />
+            >
+              <option value="">Select a Genre</option>
+              <option value="Romance/Action">Romance/Action</option>
+              <option value="Romance/Drama">Romance/Drama</option>
+              <option value="Action/Drama">Action/Drama</option>
+              <option value="Comedy/Drama">Comedy/Drama</option>
+              <option value="Action/Thriller">Action/Thriller</option>
+            </select>
           </InputWrapper>
 
           {/* Year and Director Row */}

@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import MovieGrid from "./components/MovieGrid";
 import AddMovieForm from "./components/AddMovieForm";
 import MovieDetail from "./components/MovieDetail";
+import { getMovies, createMovie } from "./api/movieAPI";
 
 const SAMPLE_MOVIES = [
   {
@@ -58,7 +59,7 @@ const SAMPLE_MOVIES = [
 ];
 
 function App() {
-  const [movies, setMovies] = useState(SAMPLE_MOVIES);
+  const [movies, setMovies] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,6 +71,23 @@ function App() {
   // Dashboard stats
   const [stats, setStats] = useState({ total: 0, averageRating: 0 });
 
+  // Fetch movies from database
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const response = await getMovies();
+        const formattedMovies = response.data.map(movie => ({
+          ...movie,
+          id: movie._id
+        }));
+        setMovies(formattedMovies);
+      } catch (error) {
+        console.error("Error fetching movies from DB:", error);
+      }
+    };
+    fetchMovies();
+  }, []);
+
   useEffect(() => {
     const total = movies.length; //use effect k garne vanera yeta lekhne(internal state vanda bahek external ko lagi we use useeffect)
     const avg = total > 0
@@ -79,9 +97,25 @@ function App() {
     setStats({ total, averageRating: avg });
   }, [movies]);
 
-  const handleAddMovie = (newMovie) => {
-    setMovies([newMovie, ...movies]);
-    setShowForm(false);
+  const handleAddMovie = async (newMovie) => {
+    try {
+      const moviePayload = {
+        ...newMovie,
+        year: Number(newMovie.year),
+        rating: Number(newMovie.rating || 5.0)
+      };
+      const response = await createMovie(moviePayload);
+      const createdMovie = {
+        ...response.data.movie,
+        id: response.data.movie._id
+      };
+      setMovies(prev => [createdMovie, ...prev]);
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error adding movie:", error);
+      const serverError = error.response?.data?.error || error.response?.data?.message || "Failed to save movie. Please check your inputs.";
+      alert(`Could not save movie: ${serverError}`);
+    }
   };
 
   const toggleWatchlist = (movie) => {
