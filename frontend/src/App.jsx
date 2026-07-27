@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import MovieGrid from "./components/MovieGrid";
 import AddMovieForm from "./components/AddMovieForm";
 import MovieDetail from "./components/MovieDetail";
+import AuthForm from "./components/AuthForm";
 import { getMovies, createMovie } from "./api/movieAPI";
 
 const SAMPLE_MOVIES = [
@@ -63,6 +64,15 @@ function App() {
   const [showForm, setShowForm] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAuth, setShowAuth] = useState(false);
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem("user");
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
 
   // 1. Separate state array for Watchlist
   const [watchlistIds, setWatchlistIds] = useState([]);
@@ -142,23 +152,40 @@ function App() {
           setShowForm(!showForm);
           setSelectedMovie(null);
           setIsWatchlistView(false);
+          setShowAuth(false);
         }}
         showForm={showForm}
         onBrowse={() => {
           setIsWatchlistView(false);
           setSelectedMovie(null);
           setShowForm(false);
+          setShowAuth(false);
         }}
         onWatchlist={() => {
           setIsWatchlistView(true);
           setSelectedMovie(null);
           setShowForm(false);
+          setShowAuth(false);
         }}
         isWatchlistView={isWatchlistView}
+        user={user}
+        showAuthForm={showAuth}
+        onAuthClick={() => {
+          setShowAuth(true);
+          setShowForm(false);
+          setSelectedMovie(null);
+          setIsWatchlistView(false);
+        }}
+        onLogout={() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+          setShowAuth(false);
+        }}
       />
 
       <main className="container mx-auto py-10 px-4">
-        {!selectedMovie && !showForm && (
+        {!selectedMovie && !showForm && !showAuth && (
           <>
             <header className="mb-8 text-center relative px-4">
               <div className="max-w-4xl mx-auto">
@@ -254,14 +281,24 @@ function App() {
           </>
         )}
 
-        {showForm && (
+        {showForm && !showAuth && (
           <div className="max-w-2xl mx-auto mb-16">
             <AddMovieForm onAddMovie={handleAddMovie} onCancel={() => setShowForm(false)} />
           </div>
         )}
 
-        {selectedMovie && !showForm && (
+        {selectedMovie && !showForm && !showAuth && (
           <MovieDetail movie={selectedMovie} onBack={() => setSelectedMovie(null)} />
+        )}
+
+        {showAuth && (
+          <AuthForm
+            onAuthSuccess={(userData) => {
+              setUser(userData);
+              setShowAuth(false);
+            }}
+            onCancel={() => setShowAuth(false)}
+          />
         )}
       </main>
     </div>

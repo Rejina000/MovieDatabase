@@ -14,7 +14,7 @@ export async function registerUser(req, res) {
        
         if (user) {
             const token = generateToken(user);
-            res.cookie('jwt-token',token,cookieOptions);
+            res.cookie('jwtToken',token,cookieOptions);
 
 
             return res.status(201).json({
