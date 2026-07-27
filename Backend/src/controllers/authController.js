@@ -1,12 +1,21 @@
 import * as AuthModel from '../models/authModel.js';
 import { generateToken } from '../utils/auth.js';
 
+const cookieOptions={
+    httpOnly:true,
+    maxAge:7*24*60*60*1000,
+    sameSite:process.env.NODE_ENV==='production'?'none':'lax',
+    secure:process.env.NODE_ENV==='production',
+};
+
 export async function registerUser(req, res) {
     try {
         const user = await AuthModel.register(req.body);
-
+       
         if (user) {
             const token = generateToken(user);
+            res.cookie('jwt-token',token,cookieOptions);
+
 
             return res.status(201).json({
                 message: "User registered successfully",
@@ -14,8 +23,8 @@ export async function registerUser(req, res) {
                     _id: user._id,
                     username: user.username,
                     email: user.email,
-                    isAdmin: user.isAdmin,
-                    token: token,
+                    isAdmin: user.isAdmin
+                    
                 },
             });
         }
@@ -33,9 +42,12 @@ export async function registerUser(req, res) {
 export async function loginUser(req, res) {
     try {
         const user = await AuthModel.login(req.body);
+       
+
 
         if (user) {
             const token = generateToken(user);
+            res.cookie('jwt-token',token,cookieOptions);
 
             return res.status(200).json({
                 message: 'User logged in successfully',
