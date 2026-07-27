@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import SAMPLE_MOVIES from "./data/movies.js";
 import dotenv from "dotenv";
 import movieRouter from "./src/routes/movieRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
