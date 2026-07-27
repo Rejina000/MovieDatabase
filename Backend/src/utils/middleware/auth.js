@@ -3,13 +3,15 @@ import { verifyToken } from "../auth.js";
 const authenticate = (req, res, next) => {
     console.log("Authorization Header:", req.headers.authorization);
 
-    const token = req.headers.authorization;
+    const token =
+        req.headers.authorization?.split(" ")[1] ||
+        req.cookies?.jwtToken;
 
-    if (!token || !token.startsWith("Bearer ")) {
+    if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const isValid = verifyToken(token.split(" ")[1]);
+    const isValid = verifyToken(token);
     console.log("Decoded Token:", isValid);
 
     if (!isValid) {
