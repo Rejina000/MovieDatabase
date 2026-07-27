@@ -30,6 +30,7 @@ app.use(cors(
 
 // Mount the movie router under /movies
 
+app.get('/health',(req,res)=>req.statusCode(200).json({ok:true}))
 app.use("/movies", movieRouter);
 app.use("/auth", authRoutes);
 
