@@ -18,7 +18,7 @@ app.use(cors(
     {
         origin:(origin,callback)=>{
             if(!origin ||
-                 ['http://localhost5173',process.env.FRONTEND_URL].includes(origin)){
+                 ['http://localhost:5173',process.env.FRONTEND_URL].includes(origin)){
                 return callback(null,true)
             }
             callback(new Error('CORS origin not allowed'))
@@ -29,7 +29,9 @@ app.use(cors(
 
 // Mount the movie router under /movies
 
-app.get('/health',(req,res)=>req.statusCode(200).json({ok:true}))
+app.get("/health", (req, res) => {
+    res.status(200).json({ ok: true });
+  });
 app.use("/movies", movieRouter);
 app.use("/auth", authRoutes);
 
