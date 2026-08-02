@@ -1,25 +1,26 @@
-import movie from "../../data/movie.js";
-import { ObjectId } from "mongodb";
+import SAMPLE_MOVIES from "../data/movies.js";
 
-export async function getAll() {
-    return movie.find();
+export function getAll() {
+    return SAMPLE_MOVIES;
 }
 
-export async function getById(id) {
-    const updatedId = new ObjectId(id);
-    const foundMovie = await movie.findById(updatedId);
-    return foundMovie;
+export function addMovie(movie) {
+    SAMPLE_MOVIES.push(movie);
 }
 
-export async function addMovie(newMovie) {
-    return movie.create(newMovie);
-}
+export function updateMovie(id, newMovie) {
+    const index = SAMPLE_MOVIES.findIndex(
+        (movie) => movie.id == id
+    );
 
-export async function updateMovie(id, newMovie) {
-    const updatedId = new ObjectId(id);
-    const updatedMovie = await movie.findByIdAndUpdate(updatedId, newMovie, {
-        new: true,
-        runValidators: true,
+    if (index === -1) {
+        return null;
+    }
+
+    SAMPLE_MOVIES.splice(index, 1, {
+        ...SAMPLE_MOVIES[index],
+        ...newMovie,
     });
-    return updatedMovie;
+
+    return SAMPLE_MOVIES[index];
 }
