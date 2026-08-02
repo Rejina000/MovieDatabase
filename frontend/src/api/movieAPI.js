@@ -1,7 +1,8 @@
 import axios from 'axios'
 
+
 const api = axios.create({
-  baseURL: 'http://localhost:3001',
+  baseURL: 'https://moviedatabase-zies.onrender.com',
 })
 
 // Request interceptor to automatically attach authorization headers
