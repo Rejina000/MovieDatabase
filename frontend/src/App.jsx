@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import MovieGrid from "./components/MovieGrid";
 import AddMovieForm from "./components/AddMovieForm";
 import MovieDetail from "./components/MovieDetail";
+import AuthForm from "./components/AuthForm";
 
 const SAMPLE_MOVIES = [
   {
@@ -58,6 +59,14 @@ const SAMPLE_MOVIES = [
 ];
 
 function App() {
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  });
+  const [showAuth, setShowAuth] = useState(false);
   const [movies, setMovies] = useState(SAMPLE_MOVIES);
   const [showForm, setShowForm] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
@@ -121,9 +130,41 @@ function App() {
           setShowForm(false);
         }}
         isWatchlistView={isWatchlistView}
+        user={user}
+        onLogin={() => setShowAuth(true)}
+        onLogout={() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+        }}
       />
 
+      {showAuth && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm">
+          <div className="w-full">
+            <AuthForm
+              onAuthSuccess={(authenticatedUser) => {
+                setUser(authenticatedUser);
+                setShowAuth(false);
+              }}
+              onCancel={() => setShowAuth(false)}
+            />
+          </div>
+        </div>
+      )}
+
       <main className="container mx-auto py-10 px-4">
+        {!user ? (
+          <section className="mx-auto mt-12 max-w-2xl rounded-3xl border border-blue-100 bg-white px-8 py-16 text-center shadow-xl shadow-blue-500/5">
+            <p className="text-sm font-black tracking-[0.25em] text-blue-600">MOVIE APP</p>
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-gray-900 md:text-5xl">Your movie dashboard</h2>
+            <p className="mx-auto mt-4 max-w-lg text-gray-500">Log in to browse movies, manage your Watch Later list, and add movies to your collection.</p>
+            <button onClick={() => setShowAuth(true)} className="mt-8 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700">
+              Log in to continue
+            </button>
+          </section>
+        ) : (
+          <>
         {!selectedMovie && !showForm && (
           <>
             <header className="mb-8 text-center relative px-4">
@@ -228,6 +269,8 @@ function App() {
 
         {selectedMovie && !showForm && (
           <MovieDetail movie={selectedMovie} onBack={() => setSelectedMovie(null)} />
+        )}
+          </>
         )}
       </main>
     </div>
