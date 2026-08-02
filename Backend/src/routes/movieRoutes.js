@@ -6,16 +6,12 @@ import {
     updateMovie,
 } from "../controllers/movieController.js";
 
-import { movieRules, validate } from "../validators/movieValidator.js";
-import authenticate from "../utils/middleware/auth.js"; // <-- Add this
-
 const router = express.Router();
 
+// Define route mapping to movieController handlers
 router.get("/", getMovies);
 router.get("/:id", getMovieById);
-
-router.post("/", authenticate, movieRules, validate, createMovie);
-
-router.put("/:id", authenticate, movieRules, validate, updateMovie);
+router.post("/", createMovie);
+router.put("/:id", updateMovie);
 
 export default router;
