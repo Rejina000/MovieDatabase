@@ -1,8 +1,17 @@
 import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import SAMPLE_MOVIES from "./data/movies.js";
-
+import authRoutes from "./src/routes/authRoutes.js";
+import dbConnection from "./src/config/db.js";
+import aiRouter from "./src/routes/aiRoutes.js";
 const app = express();
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
+app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
+app.use("/api/ai", aiRouter);
 
 const PORT = 3001; // Frontend ko application localhost mai run vairaxa backend pani yesmai run vayo vane conflict aauxa so also initially default for JS is 3000
 
@@ -65,6 +74,8 @@ app.put("/movies/:id", (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+dbConnection().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
 });
