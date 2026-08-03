@@ -4,6 +4,7 @@ import MovieGrid from "./components/MovieGrid";
 import AddMovieForm from "./components/AddMovieForm";
 import MovieDetail from "./components/MovieDetail";
 import AuthForm from "./components/AuthForm";
+import AiRecommendations from "./components/AiRecommendations";
 
 const SAMPLE_MOVIES = [
   {
@@ -237,6 +238,10 @@ function App() {
                 )}
               </div>
             </header>
+
+            {isWatchlistView && (
+              <AiRecommendations movies={movies} watchlistIds={watchlistIds} />
+            )}
 
             {displayMovies.length > 0 ? (
               <MovieGrid

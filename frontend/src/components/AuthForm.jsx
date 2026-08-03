@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
-// Vite forwards /api requests to the backend during local development.
+// Uses the Vite proxy (/api -> http://localhost:3001) during local dev.
+// Set VITE_API_URL in frontend/.env to point at a deployed backend instead.
 const API_URL = import.meta.env.VITE_API_URL || "";
 
 const AuthForm = ({ onAuthSuccess, onCancel, initialMode = "login" }) => {
@@ -56,7 +57,13 @@ const AuthForm = ({ onAuthSuccess, onCancel, initialMode = "login" }) => {
           }),
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || result.message);
+        if (!response.ok) {
+          throw new Error(
+            response.status >= 500
+              ? "Cannot reach the backend. Run \"npm start\" inside the Backend folder, then try again."
+              : result.error || result.message
+          );
+        }
         localStorage.setItem("token", result.data.token);
         localStorage.setItem("user", JSON.stringify(result.data));
         onAuthSuccess(result.data);
@@ -71,7 +78,13 @@ const AuthForm = ({ onAuthSuccess, onCancel, initialMode = "login" }) => {
           }),
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || result.message);
+        if (!response.ok) {
+          throw new Error(
+            response.status >= 500
+              ? "Cannot reach the backend. Run \"npm start\" inside the Backend folder, then try again."
+              : result.error || result.message
+          );
+        }
         localStorage.setItem("token", result.data.token);
         localStorage.setItem("user", JSON.stringify(result.data));
         onAuthSuccess(result.data);
