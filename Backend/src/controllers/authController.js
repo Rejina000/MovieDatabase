@@ -94,3 +94,63 @@ export async function getCurrentUser(req, res) {
         });
     }
 }
+
+export async function getUserWatchlist(req, res) {
+    try {
+        const user = await AuthModel.getWatchlist(req.user.userId);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        return res.status(200).json({
+            data: { watchlist: user.watchlist },
+        });
+    } catch (error) {
+        return res.status(400).json({
+            error: error.message
+        });
+    }
+}
+
+export async function addToWatchlist(req, res) {
+    try {
+        const { movieId } = req.params;
+
+        const user = await AuthModel.addToWatchlist(req.user.userId, movieId);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        return res.status(200).json({
+            message: "Movie added to watchlist",
+            data: { watchlist: user.watchlist },
+        });
+    } catch (error) {
+        return res.status(400).json({
+            error: error.message
+        });
+    }
+}
+
+export async function removeFromWatchlist(req, res) {
+    try {
+        const { movieId } = req.params;
+
+        const user = await AuthModel.removeFromWatchlist(req.user.userId, movieId);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        return res.status(200).json({
+            message: "Movie removed from watchlist",
+            data: { watchlist: user.watchlist },
+        });
+    } catch (error) {
+        return res.status(400).json({
+            error: error.message
+        });
+    }
+}

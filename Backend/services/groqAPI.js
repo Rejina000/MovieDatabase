@@ -1,7 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 const SystemInstruction = `
@@ -45,15 +45,17 @@ RULES:
 
 export const generateAIResponse = async (prompt) => {
   try {
-    const interaction = await ai.interactions.create({
-      model: "gemini-3.6-flash",
-      input: prompt,
-      system_instruction: SystemInstruction,
+    const chatCompletion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: SystemInstruction },
+        { role: "user", content: prompt },
+      ],
     });
 
-    return interaction.output_text;
+    return chatCompletion.choices[0]?.message?.content || "";
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Groq Error:", error);
     return "Sorry, I couldn't generate movie recommendations right now.";
   }
 };

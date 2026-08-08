@@ -1,15 +1,53 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 import SAMPLE_MOVIES from "../../data/movies.js";
+import { verifyToken } from "../utils/auth.js";
+import * as AuthModel from "../models/authModel.js";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function recommendMovies(req, res) {
     try {
-        const { watchlist = [], genres = [] } = req.body || {};
+        let watchlist = [];
+        let genres = [];
+
+        const token =
+            req.headers.authorization?.split(" ")[1] ||
+            req.cookies?.jwtToken;
+        const payload = token ? verifyToken(token) : null;
+
+        if (payload && payload.userId) {
+            const user = await AuthModel.getWatchlist(payload.userId);
+
+            if (user && user.watchlist.length > 0) {
+                const movies = user.watchlist.filter(Boolean);
+                watchlist = movies.map((m) => m.title);
+                genres = [
+                    ...new Set(
+                        movies
+                            .flatMap((m) => (m.genre || "").split("/"))
+                            .map((g) => g.trim())
+                            .filter(Boolean)
+                    ),
+                ];
+            }
+        }
+
+        const {
+            watchlist: bodyWatchlist = [],
+            genres: bodyGenres = [],
+            preferences: bodyPreferences = "",
+        } = req.body || {};
 
         if (watchlist.length === 0 && genres.length === 0) {
+            watchlist = bodyWatchlist;
+            genres = bodyGenres;
+        }
+        const preferences = String(bodyPreferences || "").trim();
+
+        if (watchlist.length === 0 && genres.length === 0 && !preferences) {
             return res.status(400).json({
-                error: "Add movies to your watchlist so we can recommend something.",
+                error:
+                    "Add movies to your watchlist or tell us your preferences so we can recommend something.",
             });
         }
 
@@ -17,7 +55,7 @@ export async function recommendMovies(req, res) {
             (m) => `- "${m.title}" (${m.genre}, ${m.year}, rating ${m.rating}): ${m.synopsis}`
         ).join("\n");
 
-        const prompt = `Based on this user's watchlist: [${watchlist.join(", ")}] and favourite genres: [${genres.join(", ")}], recommend exactly 3 movies from our database they would enjoy, with reasons. Only choose movies from the database list below. Return JSON in exactly this format:
+        const prompt = `Based on this user's watchlist: [${watchlist.join(", ")}]${genres.length ? `, favourite genres: [${genres.join(", ")}]` : ""}${preferences ? `, and their preferences: "${preferences}"` : ""}, recommend exactly 3 movies from our database they would enjoy, with reasons. Only choose movies from the database list below. Return JSON in exactly this format:
 {
   "recommendations": [
     { "title": "<movie title>", "reason": "<why they would enjoy it>" }
@@ -27,19 +65,26 @@ export async function recommendMovies(req, res) {
 Our database movies:
 ${catalog}`;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-            },
+        const response = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+                {
+                    role: "system",
+                    content:
+                        "You are MovieMate AI, a movie recommendation assistant. Always reply with valid JSON only.",
+                },
+                { role: "user", content: prompt },
+            ],
+            response_format: { type: "json_object" },
         });
+
+        const content = response.choices?.[0]?.message?.content || "";
 
         let parsed;
         try {
-            parsed = JSON.parse(response.text);
+            parsed = JSON.parse(content);
         } catch {
-            return res.status(502).json({ error: "Gemini returned an invalid response." });
+            return res.status(502).json({ error: "Groq returned an invalid response." });
         }
 
         const recommendations = (parsed.recommendations || [])
@@ -56,7 +101,7 @@ ${catalog}`;
 
         if (recommendations.length === 0) {
             return res.status(502).json({
-                error: "Gemini did not return movies from the database.",
+                error: "Groq did not return movies from the database.",
             });
         }
 
