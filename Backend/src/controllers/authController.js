@@ -23,8 +23,7 @@ export async function registerUser(req, res) {
                     _id: user._id,
                     username: user.username,
                     email: user.email,
-                    isAdmin: user.isAdmin,
-                    token
+                    isAdmin: user.isAdmin
                     
                 },
             });
@@ -73,7 +72,7 @@ export async function loginUser(req, res) {
     }
 }
 
-export async function getMe(req, res) {
+export async function getCurrentUser(req, res) {
     try {
         const user = await AuthModel.getUserById(req.user.userId);
 

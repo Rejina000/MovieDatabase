@@ -6,6 +6,9 @@ import MovieDetail from "./components/MovieDetail";
 import AuthForm from "./components/AuthForm";
 import AiRecommendations from "./components/AiRecommendations";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+const getToken = () => localStorage.getItem("token");
+
 const SAMPLE_MOVIES = [
   {
     id: 1,
@@ -89,17 +92,82 @@ function App() {
     setStats({ total, averageRating: avg });
   }, [movies]);
 
-  const handleAddMovie = (newMovie) => {
-    setMovies([newMovie, ...movies]);
-    setShowForm(false);
+  // Load movies and the logged-in user's watchlist from the backend
+  useEffect(() => {
+    if (!user) {
+      setWatchlistIds([]);
+      return;
+    }
+
+    fetch(`${API_URL}/movies`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setMovies(data);
+      })
+      .catch(() => {
+        // Keep the local SAMPLE_MOVIES if the backend is unreachable
+      });
+
+    fetch(`${API_URL}/api/auth/watchlist`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        const list = result?.data?.watchlist || [];
+        setWatchlistIds(list.map((m) => m._id || m));
+      })
+      .catch(() => {});
+  }, [user]);
+
+  const handleAddMovie = async (newMovie) => {
+    try {
+      const res = await fetch(`${API_URL}/movies`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newMovie.title,
+          genre: newMovie.genre,
+          year: Number(newMovie.year),
+          rating: 5.0,
+          director: newMovie.director,
+          synopsis: newMovie.synopsis,
+          poster: newMovie.poster,
+        }),
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert(result.error || "Failed to add movie");
+        return;
+      }
+
+      setMovies([result.movie, ...movies]);
+      setShowForm(false);
+    } catch {
+      alert("Cannot reach the backend to add the movie.");
+    }
   };
 
   const toggleWatchlist = (movie) => {
-    setWatchlistIds(prev =>
-      prev.includes(movie.id)
-        ? prev.filter(id => id !== movie.id)
-        : [...prev, movie.id]
-    );
+    const movieId = movie._id || movie.id;
+    const isOn = watchlistIds.includes(movieId);
+
+    fetch(`${API_URL}/api/auth/watchlist/${movieId}`, {
+      method: isOn ? "DELETE" : "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (!result.error) {
+          setWatchlistIds((ids) =>
+            isOn ? ids.filter((id) => id !== movieId) : [...ids, movieId]
+          );
+        }
+      })
+      .catch((err) => console.error("Watchlist update failed:", err));
   };
 
   const filteredMovies = movies.filter(movie =>
@@ -108,7 +176,7 @@ function App() {
 
   // If in watchlist view, further filter to only pinned movies
   const displayMovies = isWatchlistView
-    ? filteredMovies.filter(m => watchlistIds.includes(m.id))
+    ? filteredMovies.filter(m => watchlistIds.includes(m._id || m.id))
     : filteredMovies;
 
   return (

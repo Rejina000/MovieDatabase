@@ -6,11 +6,11 @@ const MovieGrid = ({ movies, onMovieClick, onToggleWatchlist, watchlistIds }) =>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 p-4">
       {movies.map((movie) => (
         <MovieCard 
-          key={movie.id} 
+          key={movie._id || movie.id} 
           movie={movie} 
           onClick={onMovieClick}
           onToggleWatchlist={onToggleWatchlist}
-          isWatchlisted={watchlistIds.includes(movie.id)}
+          isWatchlisted={watchlistIds.includes(movie._id || movie.id)}
         />
       ))}
     </div>

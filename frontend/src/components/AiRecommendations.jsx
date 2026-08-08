@@ -6,13 +6,15 @@ const AiRecommendations = ({ movies, watchlistIds }) => {
   const [recommendations, setRecommendations] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [preferences, setPreferences] = useState("");
 
-  const watchlistMovies = movies.filter((m) => watchlistIds.includes(m.id));
+  const watchlistMovies = movies.filter((m) => watchlistIds.includes(m._id || m.id));
   const genres = [
     ...new Set(watchlistMovies.flatMap((m) => m.genre.split("/").map((g) => g.trim()))),
   ];
   const titles = watchlistMovies.map((m) => m.title);
   const hasWatchlist = watchlistMovies.length > 0;
+  const hasPreferences = preferences.trim().length > 0;
 
   const handleRecommend = async () => {
     setError("");
@@ -22,14 +24,17 @@ const AiRecommendations = ({ movies, watchlistIds }) => {
     try {
       const response = await fetch(`${API_URL}/api/ai/recommend`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ watchlist: titles, genres }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ watchlist: titles, genres, preferences }),
       });
       const result = await response.json();
       if (!response.ok) {
         throw new Error(
           response.status >= 500
-            ? "AI service unavailable right now. Check that GEMINI_API_KEY is set and try again."
+            ? "AI service unavailable right now. Check that GROQ_API_KEY is set and try again."
             : result.error || "Failed to get recommendations."
         );
       }
@@ -56,13 +61,13 @@ const AiRecommendations = ({ movies, watchlistIds }) => {
             </span>
           </h3>
           <p className="text-sm text-gray-500 font-medium mt-1">
-            Gemini recommends movies from your collection based on your Watch Later list.
+            Groq recommends movies from your collection based on your Watch Later list and preferences.
           </p>
         </div>
 
         <button
           onClick={handleRecommend}
-          disabled={loading || !hasWatchlist}
+          disabled={loading || (!hasWatchlist && !hasPreferences)}
           className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-purple-500/25 transition hover:shadow-xl hover:shadow-purple-500/30 hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
@@ -111,9 +116,32 @@ const AiRecommendations = ({ movies, watchlistIds }) => {
         </button>
       </div>
 
-      {!hasWatchlist && !error && (
+      <div className="mt-5">
+        <label
+          htmlFor="ai-preferences"
+          className="mb-2 block text-sm font-bold text-gray-700"
+        >
+          Your preferences{" "}
+          <span className="font-medium text-gray-400">
+            (e.g. Action, Romance, Comedy, thriller, 90s movies...)
+          </span>
+        </label>
+        <textarea
+          id="ai-preferences"
+          rows="2"
+          placeholder="Tell the AI what you like — genres, actors, languages, moods, or anything else..."
+          value={preferences}
+          onChange={(e) => setPreferences(e.target.value)}
+          className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-800 shadow-sm transition-all focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-400"
+        />
+        <p className="mt-2 text-xs text-gray-400 font-medium">
+          Add movies to your Watch Later list and/or describe your preferences, then ask for recommendations.
+        </p>
+      </div>
+
+      {!hasWatchlist && !hasPreferences && !error && (
         <p className="mt-4 text-sm text-gray-400 font-medium">
-          Add movies to your Watch Later list first, then ask for recommendations.
+          Add movies to your Watch Later list or type your preferences, then ask for recommendations.
         </p>
       )}
 
@@ -127,7 +155,7 @@ const AiRecommendations = ({ movies, watchlistIds }) => {
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {recommendations.map((rec, i) => (
             <div
-              key={rec.movie.id}
+              key={rec.movie._id || rec.movie.id}
               className="group rounded-2xl border border-purple-100 bg-white p-4 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10"
             >
               <div className="flex items-start gap-3">
