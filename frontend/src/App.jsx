@@ -3,6 +3,11 @@ import Navbar from "./components/Navbar";
 import MovieGrid from "./components/MovieGrid";
 import AddMovieForm from "./components/AddMovieForm";
 import MovieDetail from "./components/MovieDetail";
+import AuthForm from "./components/AuthForm";
+import AiRecommendations from "./components/AiRecommendations";
+
+const API_URL = import.meta.env.VITE_API_URL || "";
+const getToken = () => localStorage.getItem("token");
 
 const SAMPLE_MOVIES = [
   {
@@ -58,6 +63,14 @@ const SAMPLE_MOVIES = [
 ];
 
 function App() {
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  });
+  const [showAuth, setShowAuth] = useState(false);
   const [movies, setMovies] = useState(SAMPLE_MOVIES);
   const [showForm, setShowForm] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
@@ -79,17 +92,82 @@ function App() {
     setStats({ total, averageRating: avg });
   }, [movies]);
 
-  const handleAddMovie = (newMovie) => {
-    setMovies([newMovie, ...movies]);
-    setShowForm(false);
+  // Load movies and the logged-in user's watchlist from the backend
+  useEffect(() => {
+    if (!user) {
+      setWatchlistIds([]);
+      return;
+    }
+
+    fetch(`${API_URL}/movies`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setMovies(data);
+      })
+      .catch(() => {
+        // Keep the local SAMPLE_MOVIES if the backend is unreachable
+      });
+
+    fetch(`${API_URL}/api/auth/watchlist`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        const list = result?.data?.watchlist || [];
+        setWatchlistIds(list.map((m) => m._id || m));
+      })
+      .catch(() => {});
+  }, [user]);
+
+  const handleAddMovie = async (newMovie) => {
+    try {
+      const res = await fetch(`${API_URL}/movies`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newMovie.title,
+          genre: newMovie.genre,
+          year: Number(newMovie.year),
+          rating: 5.0,
+          director: newMovie.director,
+          synopsis: newMovie.synopsis,
+          poster: newMovie.poster,
+        }),
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert(result.error || "Failed to add movie");
+        return;
+      }
+
+      setMovies([result.movie, ...movies]);
+      setShowForm(false);
+    } catch {
+      alert("Cannot reach the backend to add the movie.");
+    }
   };
 
   const toggleWatchlist = (movie) => {
-    setWatchlistIds(prev =>
-      prev.includes(movie.id)
-        ? prev.filter(id => id !== movie.id)
-        : [...prev, movie.id]
-    );
+    const movieId = movie._id || movie.id;
+    const isOn = watchlistIds.includes(movieId);
+
+    fetch(`${API_URL}/api/auth/watchlist/${movieId}`, {
+      method: isOn ? "DELETE" : "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (!result.error) {
+          setWatchlistIds((ids) =>
+            isOn ? ids.filter((id) => id !== movieId) : [...ids, movieId]
+          );
+        }
+      })
+      .catch((err) => console.error("Watchlist update failed:", err));
   };
 
   const filteredMovies = movies.filter(movie =>
@@ -98,7 +176,7 @@ function App() {
 
   // If in watchlist view, further filter to only pinned movies
   const displayMovies = isWatchlistView
-    ? filteredMovies.filter(m => watchlistIds.includes(m.id))
+    ? filteredMovies.filter(m => watchlistIds.includes(m._id || m.id))
     : filteredMovies;
 
   return (
@@ -121,9 +199,41 @@ function App() {
           setShowForm(false);
         }}
         isWatchlistView={isWatchlistView}
+        user={user}
+        onLogin={() => setShowAuth(true)}
+        onLogout={() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+        }}
       />
 
+      {showAuth && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm">
+          <div className="w-full">
+            <AuthForm
+              onAuthSuccess={(authenticatedUser) => {
+                setUser(authenticatedUser);
+                setShowAuth(false);
+              }}
+              onCancel={() => setShowAuth(false)}
+            />
+          </div>
+        </div>
+      )}
+
       <main className="container mx-auto py-10 px-4">
+        {!user ? (
+          <section className="mx-auto mt-12 max-w-2xl rounded-3xl border border-blue-100 bg-white px-8 py-16 text-center shadow-xl shadow-blue-500/5">
+            <p className="text-sm font-black tracking-[0.25em] text-blue-600">MOVIE APP</p>
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-gray-900 md:text-5xl">Your movie dashboard</h2>
+            <p className="mx-auto mt-4 max-w-lg text-gray-500">Log in to browse movies, manage your Watch Later list, and add movies to your collection.</p>
+            <button onClick={() => setShowAuth(true)} className="mt-8 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700">
+              Log in to continue
+            </button>
+          </section>
+        ) : (
+          <>
         {!selectedMovie && !showForm && (
           <>
             <header className="mb-8 text-center relative px-4">
@@ -197,6 +307,10 @@ function App() {
               </div>
             </header>
 
+            {isWatchlistView && (
+              <AiRecommendations movies={movies} watchlistIds={watchlistIds} />
+            )}
+
             {displayMovies.length > 0 ? (
               <MovieGrid
                 movies={displayMovies}
@@ -228,6 +342,8 @@ function App() {
 
         {selectedMovie && !showForm && (
           <MovieDetail movie={selectedMovie} onBack={() => setSelectedMovie(null)} />
+        )}
+          </>
         )}
       </main>
     </div>

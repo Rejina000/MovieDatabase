@@ -8,16 +8,34 @@ import dbConnection from "./src/config/db.js";
 import { seedIfEmpty } from "./src/models/movieModel.js";
 
 const app = express();
+
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Root route
+app.get("/", (req, res) => {
+    res.status(200).json({
+        message: "Movie Database API is running",
+        status: "success"
+    });
+});
+
+// Health check
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        ok: true
+    });
+});
 
 app.use("/movies", movieRouter);
 app.use("/api/auth", authRoutes);
 app.use("/auth", authRoutes);
 app.use("/api/ai", aiRouter);
 
-const PORT = 3001; // Frontend ko application localhost mai run vairaxa backend pani yesmai run vayo vane conflict aauxa so also initially default for JS is 3000
+// Local: 3001
+// Render: uses Render's assigned PORT
+const PORT = process.env.PORT || 3001;
 
 dbConnection().then(async () => {
     await seedIfEmpty();
